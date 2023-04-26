@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<MorpheusModel version="4">
+    <Description>
+        <Details></Details>
+        <Title></Title>
+    </Description>
+    <Space>
+        <Lattice class="square">
+            <Neighborhood>
+                <Order>optimal</Order>
+            </Neighborhood>
+            <Size symbol="size" value="200, 200, 0.0"/>
+            <BoundaryConditions>
+                <Condition type="periodic" boundary="x"/>
+                <Condition type="periodic" boundary="y"/>
+            </BoundaryConditions>
+        </Lattice>
+        <SpaceSymbol symbol="space"/>
+    </Space>
+    <Time>
+        <StartTime value="0"/>
+        <StopTime value="10000"/>
+        <TimeSymbol symbol="time"/>
+        <RandomSeed value="1"/>
+    </Time>
+    <Analysis>
+        <ModelGraph include-tags="#untagged" format="dot" reduced="false"/>
+        <Gnuplotter time-step="1.0">
+            <Plot>
+                <Cells value="cell.type"/>
+            </Plot>
+            <Terminal name="png"/>
+        </Gnuplotter>
+    </Analysis>
+    <Global>
+        <Field symbol="f" value="0.0"/>
+        <System solver="Dormand-Prince [adaptive, O(5)]">
+            <DiffEqn symbol-ref="f">
+                <Expression>bruh - 0.05*f</Expression>
+            </DiffEqn>
+        </System>
+        <Constant symbol="bruh" value="0.0"/>
+    </Global>
+    <CellTypes>
+        <CellType name="c" class="biological">
+            <CellDeath>
+                <Condition>n > 6</Condition>
+            </CellDeath>
+            <CellDivision division-plane="minor">
+                <Condition>n > 1.5</Condition>
+            </CellDivision>
+            <Property symbol="n" value="0.0"/>
+            <VolumeConstraint target="120" strength="1"/>
+            <SurfaceConstraint target="10" strength="1" mode="surface"/>
+            <System time-scaling="1.0" time-step="1.0" solver="Runge-Kutta [fixed, O(4)]" solver-eps="1e-4">
+                <Constant symbol="r" value="0.01"/>
+                <DiffEqn symbol-ref="n">
+                    <Expression>r*n*n/(n*n+1) - 0.001*n</Expression>
+                </DiffEqn>
+            </System>
+            <NeighborhoodReporter>
+                <Input scaling="cell" value="cell.type == celltype.c.id"/>
+                <Output symbol-ref="n" mapping="sum"/>
+            </NeighborhoodReporter>
+            <Chemotaxis strength="2" field="f"/>
+        </CellType>
+        <CellType name="m" class="medium"/>
+    </CellTypes>
+    <CPM>
+        <Interaction>
+            <Contact type2="c" type1="c" value="3"/>
+            <Contact type2="m" type1="c" value="12"/>
+        </Interaction>
+        <ShapeSurface scaling="norm">
+            <Neighborhood>
+                <Order>optimal</Order>
+            </Neighborhood>
+        </ShapeSurface>
+        <MonteCarloSampler stepper="edgelist">
+            <MCSDuration value="1"/>
+            <MetropolisKinetics temperature="10"/>
+            <Neighborhood>
+                <Order>2</Order>
+            </Neighborhood>
+        </MonteCarloSampler>
+    </CPM>
+    <CellPopulations>
+        <Population type="c" size="20">
+            <InitCircle mode="random" number-of-cells="45">
+                <Dimensions center="size.x/2, size.y/2, 0.0" radius="size.x/4"/>
+            </InitCircle>
+        </Population>
+    </CellPopulations>
+</MorpheusModel>

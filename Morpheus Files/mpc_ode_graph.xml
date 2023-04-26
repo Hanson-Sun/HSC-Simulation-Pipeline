@@ -1,0 +1,95 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<MorpheusModel version="4">
+    <Description>
+        <Details></Details>
+        <Title></Title>
+    </Description>
+    <Space>
+        <Lattice class="square">
+            <Neighborhood>
+                <Order>1</Order>
+            </Neighborhood>
+            <Size symbol="size" value="1, 1, 0 "/>
+        </Lattice>
+        <SpaceSymbol symbol="space"/>
+    </Space>
+    <Time>
+        <StartTime value="0"/>
+        <StopTime value="50"/>
+        <TimeSymbol symbol="time"/>
+    </Time>
+    <Analysis>
+        <ModelGraph include-tags="#untagged" format="dot" reduced="false"/>
+        <Logger time-step="0.1 ">
+            <Input>
+                <Symbol symbol-ref="p"/>
+                <Symbol symbol-ref="a"/>
+                <Symbol symbol-ref="s"/>
+                <Symbol symbol-ref="h"/>
+                <Symbol symbol-ref="d"/>
+            </Input>
+            <Output>
+                <TextOutput file-name="automatic" file-format="csv"/>
+            </Output>
+            <Restriction condition="1">
+                <Celltype celltype="cell"/>
+            </Restriction>
+            <Plots>
+                <Plot file-numbering="time" log-commands="true">
+                    <Style grid="false" style="lines" line-width="3" decorate="true"/>
+                    <Terminal plot-size="200,200,0" terminal="png"/>
+                    <X-axis>
+                        <Symbol symbol-ref="time"/>
+                    </X-axis>
+                    <Y-axis>
+                        <Symbol symbol-ref="p"/>
+                        <Symbol symbol-ref="a"/>
+                        <Symbol symbol-ref="s"/>
+                        <Symbol symbol-ref="h"/>
+                        <Symbol symbol-ref="d"/>
+                    </Y-axis>
+                </Plot>
+            </Plots>
+        </Logger>
+    </Analysis>
+    <Global/>
+    <CellTypes>
+        <CellType name="cell" class="biological">
+            <Property symbol="p" value="0.1"/>
+            <Property symbol="a" value="55.5e-3"/>
+            <Property symbol="d" value="39.2e-3 "/>
+            <Property symbol="h" value="1870.3e-3"/>
+            <Property symbol="s" value="617.7e-3"/>
+            <System time-scaling="1.0" time-step="1e-4" solver="Runge-Kutta [fixed, O(4)]">
+                <Constant symbol="k1" value="0.6"/>
+                <Constant symbol="k2" value="0.25"/>
+                <Constant symbol="k3" value="0.5"/>
+                <Constant symbol="k4" value="0.3"/>
+                <Constant symbol="k5" value="0.5"/>
+                <Constant symbol="k6" value="0.25"/>
+                <Constant symbol="k7" value="0.5"/>
+                <Constant symbol="k8" value="0.25"/>
+                <DiffEqn symbol-ref="p">
+                    <Expression>a*p - d*p</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="a">
+                    <Expression>k1*p - k2*h*a</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="d">
+                    <Expression>k3*h*d - k4*p</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="h">
+                    <Expression>k5*s - k6*h</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="s">
+                    <Expression>k7*h*p - k8*s</Expression>
+                </DiffEqn>
+            </System>
+        </CellType>
+    </CellTypes>
+    <CellPopulations>
+        <Population type="cell" size="0">
+            <InitCellLattice/>
+        </Population>
+    </CellPopulations>
+</MorpheusModel>

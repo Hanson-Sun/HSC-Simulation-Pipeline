@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<MorpheusModel version="4">
+    <Description>
+        <Details>... this is the CPM model for REX...&#xd;
+&#xd;
+ill add more descriptions later...maybe</Details>
+        <Title>HSC Proliferation</Title>
+    </Description>
+    <Space>
+        <Lattice class="square">
+            <Neighborhood>
+                <Order>1</Order>
+            </Neighborhood>
+            <Size symbol="size" value="200, 200, 0.0"/>
+            <BoundaryConditions>
+                <Condition type="noflux" boundary="x"/>
+                <Condition type="noflux" boundary="y"/>
+            </BoundaryConditions>
+            <NodeLength value="1.0"/>
+        </Lattice>
+        <SpaceSymbol symbol="space"/>
+    </Space>
+    <Time>
+        <StartTime value="0"/>
+        <StopTime value="13000"/>
+        <TimeSymbol symbol="time"/>
+        <RandomSeed value="0"/>
+        <SaveInterval value="0"/>
+    </Time>
+    <Analysis>
+        <ModelGraph include-tags="#untagged" format="dot" reduced="false"/>
+        <Logger time-step="1.0">
+            <Input>
+                <Symbol symbol-ref="D"/>
+                <Symbol symbol-ref="N"/>
+                <Symbol symbol-ref="cell.id"/>
+                <Symbol symbol-ref="cell.type"/>
+                <Symbol symbol-ref="p"/>
+                <Symbol symbol-ref="Dn"/>
+                <Symbol symbol-ref="Nn"/>
+            </Input>
+            <Output>
+                <TextOutput/>
+            </Output>
+        </Logger>
+        <Gnuplotter time-step="1.0">
+            <Plot>
+                <Field surface="true" symbol-ref="U" isolines="5" min="0.0"/>
+                <Cells opacity="0.95" max="-1" min="1" value="cell.type">
+                    <ColorMap>
+                        <Color color="green" value="1"/>
+                        <Color color="dark-violet" value="-1"/>
+                    </ColorMap>
+                </Cells>
+            </Plot>
+            <Terminal name="png"/>
+        </Gnuplotter>
+    </Analysis>
+    <Global>
+        <Field symbol="U" value="0.0">
+            <Diffusion well-mixed="true" rate="1"/>
+        </Field>
+        <System time-step="10.0" solver="Euler [fixed, O(1)]">
+            <DiffEqn symbol-ref="U">
+                <Expression>f - d*U</Expression>
+            </DiffEqn>
+            <Constant symbol="d" value="0.001"/>
+        </System>
+        <Constant symbol="cell_density" value="0.003"/>
+    </Global>
+    <CellTypes>
+        <CellType name="proliferating" class="biological">
+            <Property symbol="f" name="produced chemical" value="0.01"/>
+            <Property symbol="p" name="Proliferation rate" value="0.002"/>
+            <Property symbol="color" value="1"/>
+            <Property symbol="N" name="Notch" value="0.0"/>
+            <Property symbol="D" name="Delta" value="0.0"/>
+            <Property symbol="Nn" name="Neighbourhood notch" value="0.0"/>
+            <Property symbol="Dn" name="Neighbour delta" value="0.0"/>
+            <SurfaceConstraint target="0.9" strength="1" mode="aspherity"/>
+            <VolumeConstraint target="60" strength="1"/>
+            <NeighborhoodReporter>
+                <Input scaling="cell" value="N"/>
+                <Output symbol-ref="Nn" mapping="sum"/>
+            </NeighborhoodReporter>
+            <NeighborhoodReporter>
+                <Input scaling="length" value="D"/>
+                <Output symbol-ref="Dn" mapping="average"/>
+            </NeighborhoodReporter>
+            <CellDivision division-plane="major">
+                <Condition>rand_uni(0,1) &lt; p</Condition>
+            </CellDivision>
+            <System time-scaling="1.0" time-step="0.1" solver="Runge-Kutta [fixed, O(4)]"/>
+        </CellType>
+        <CellType name="non_proliferating" class="biological">
+            <Property symbol="f" name="produced chemical" value="0.01"/>
+            <Property symbol="p" value="0.0"/>
+            <Property symbol="N" name="Notch" value="0.0"/>
+            <Property symbol="D" name="Delta" value="0.0"/>
+            <Property symbol="Nn" name="Neighbourhood notch" value="0.0"/>
+            <Property symbol="Dn" name="Neighbourhood delta" value="0.0"/>
+            <Property symbol="color" value="-1"/>
+            <NeighborhoodReporter>
+                <Input scaling="cell" value="N"/>
+                <Output symbol-ref="Nn" mapping="average"/>
+            </NeighborhoodReporter>
+            <NeighborhoodReporter>
+                <Input scaling="cell" value="D"/>
+                <Output symbol-ref="Dn" mapping="average"/>
+            </NeighborhoodReporter>
+            <System time-scaling="1.0" time-step="0.1" solver="Runge-Kutta [fixed, O(4)]"/>
+            <VolumeConstraint target="60" strength="1"/>
+            <SurfaceConstraint target="0.9 " strength="1" mode="aspherity"/>
+        </CellType>
+        <CellType name="medium" class="medium">
+            <Constant symbol="f" value="0.0"/>
+            <Constant symbol="N" value="0.0"/>
+            <Constant symbol="D" value="0.0"/>
+        </CellType>
+    </CellTypes>
+    <CPM>
+        <Interaction>
+            <Contact type2="non_proliferating" type1="non_proliferating" value="10"/>
+            <Contact type2="medium" type1="non_proliferating" value="15"/>
+            <Contact type2="medium" type1="proliferating" value="15"/>
+            <Contact type2="proliferating" type1="proliferating" value="10"/>
+        </Interaction>
+        <ShapeSurface scaling="norm">
+            <Neighborhood>
+                <Order>2</Order>
+                <!--    <Disabled>
+        <Distance>2.5</Distance>
+    </Disabled>
+-->
+            </Neighborhood>
+        </ShapeSurface>
+        <MonteCarloSampler stepper="edgelist">
+            <MCSDuration value="1"/>
+            <MetropolisKinetics temperature="10"/>
+            <Neighborhood>
+                <Order>4</Order>
+            </Neighborhood>
+        </MonteCarloSampler>
+    </CPM>
+    <CellPopulations>
+        <Population type="non_proliferating" size="0">
+            <InitCircle mode="random" number-of-cells="40 ">
+                <Dimensions center="size.x/2, size.y/2, 0" radius="size.x/3"/>
+            </InitCircle>
+        </Population>
+        <Population type="proliferating" size="0">
+            <InitCircle mode="random" number-of-cells="50">
+                <Dimensions center="size.x/2, size.y/2, 0" radius="size.x/3 "/>
+            </InitCircle>
+        </Population>
+    </CellPopulations>
+</MorpheusModel>

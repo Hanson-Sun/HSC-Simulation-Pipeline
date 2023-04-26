@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<MorpheusModel version="4">
+    <Description>
+        <Details>... this is the CPM model for REX...&#xd;&#xd;
+&#xd;&#xd;
+ill add more descriptions later...maybe</Details>
+        <Title>HSC Proliferation</Title>
+    </Description>
+    <Space>
+        <Lattice class="square">
+            <Neighborhood>
+                <Order>1</Order>
+            </Neighborhood>
+            <Size symbol="size" value="200, 200, 0.0"/>
+            <BoundaryConditions>
+                <Condition type="noflux" boundary="x"/>
+                <Condition type="noflux" boundary="y"/>
+            </BoundaryConditions>
+            <NodeLength value="1.0"/>
+        </Lattice>
+        <SpaceSymbol symbol="space"/>
+    </Space>
+    <Time>
+        <StartTime value="0"/>
+        <StopTime value="1000"/>
+        <TimeSymbol symbol="time"/>
+        <RandomSeed value="0"/>
+        <SaveInterval value="0"/>
+    </Time>
+    <Analysis>
+        <ModelGraph include-tags="#untagged" format="png" reduced="false" exclude-symbols="D_c,D_h,D_p,D_w,P_c,P_h,P_p,P_w,m,n,p,q,r,s"/>
+        <Logger time-step="1.0">
+            <Input>
+                <Symbol symbol-ref="diff"/>
+            </Input>
+            <Output>
+                <TextOutput file-format="csv"/>
+            </Output>
+        </Logger>
+        <Gnuplotter time-step="1.0">
+            <Plot>
+                <Cells opacity="0.95" max="1.2" min="0" value="diff">
+                    <ColorMap>
+                        <Color color="yellow" value="1.2"/>
+                        <Color color="dark-violet" value="0"/>
+                    </ColorMap>
+                </Cells>
+            </Plot>
+            <Terminal name="png"/>
+        </Gnuplotter>
+    </Analysis>
+    <Global/>
+    <CellTypes>
+        <CellType name="proliferating" class="biological">
+            <Property symbol="diff" name="Cell Differentiation Rate" value="0.5"/>
+            <Property symbol="h" value="1870.3e-3"/>
+            <Property symbol="b" value="89.7e-3"/>
+            <Property symbol="c" value="80.3e-3 "/>
+            <Property symbol="p" value="0.4e-3"/>
+            <Property symbol="w" value="7.8e-3"/>
+            <CellDeath>
+                <Condition>h > 2</Condition>
+            </CellDeath>
+            <SurfaceConstraint target="0.9" strength="1" mode="aspherity"/>
+            <VolumeConstraint target="60" strength="1"/>
+            <CellDivision daughterID="dcell" division-plane="major" orientation="0.0, 0.0, 0.0">
+                <Condition>rand_uni(0,1) &lt; diff*0.00043</Condition>
+                <Triggers>
+                    <Rule symbol-ref="diff">
+                        <Expression>if(dcell == 1, 0.5, diff)</Expression>
+                    </Rule>
+                    <Rule symbol-ref="h">
+                        <Expression>if( dcell == 1, 1870.3e-3, h
+)</Expression>
+                    </Rule>
+                    <Rule symbol-ref="b">
+                        <Expression>if( dcell == 1, 89.7e-3, b) </Expression>
+                    </Rule>
+                    <Rule symbol-ref="c">
+                        <Expression>if( dcell == 1, 80.3e-3, c)</Expression>
+                    </Rule>
+                    <Rule symbol-ref="p">
+                        <Expression>if( dcell == 1, 0.4e-3, p)</Expression>
+                    </Rule>
+                    <Rule symbol-ref="w">
+                        <Expression>if( dcell == 1, 7.8e-3, w)</Expression>
+                    </Rule>
+                </Triggers>
+            </CellDivision>
+            <System time-scaling="0.1" time-step="1e-2" solver="Runge-Kutta [fixed, O(4)]">
+                <Constant symbol="K" value="0.2"/>
+                <Constant symbol="M" value="0.15"/>
+                <Constant symbol="P_h" value="2"/>
+                <Constant symbol="D_h" value="0.5"/>
+                <Constant symbol="P_b" value="1"/>
+                <Constant symbol="D_b" value="0.5"/>
+                <Constant symbol="P_c" value="1.1"/>
+                <Constant symbol="D_c" value="1"/>
+                <Constant symbol="P_p" value="1"/>
+                <Constant symbol="D_p" value="0.8"/>
+                <Constant symbol="P_w" value="1.1"/>
+                <Constant symbol="D_w" value="0.5"/>
+                <Constant symbol="n" value="1"/>
+                <Constant symbol="m" value="1"/>
+                <Constant symbol="q" value="1 "/>
+                <Constant symbol="r" value="1"/>
+                <Constant symbol="s" value="1"/>
+                <Constant symbol="" value="1"/>
+                <DiffEqn symbol-ref="diff">
+                    <Expression>K * (P_h * (h^n / (1 + h^n)) + P_b * (b^m / (1 + b^m)) + P_c * (c^q / (1 + c^q))) - M * diff * (P_p * (p^r / (1 + p^r)) + P_w * (w^s / (1 + w^s)))</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="h">
+                    <Expression>K * P_h * (h^m / (1 + h^m)) - D_h * h</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="b">
+                    <Expression>K * P_b * (b^m / (1 + b^m)) - D_b * b</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="c">
+                    <Expression>K * P_c * (c^q / (1 + c^q)) - D_c * c</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="p">
+                    <Expression>M * (P_p * (1 / (1 + p^r)) - D_p * p)</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="w">
+                    <Expression>M * (P_w * (1 / (1 + w^s)) - D_w * w)</Expression>
+                </DiffEqn>
+            </System>
+        </CellType>
+        <CellType name="medium" class="medium"/>
+    </CellTypes>
+    <CPM>
+        <Interaction>
+            <Contact type2="medium" type1="proliferating" value="15"/>
+            <Contact type2="proliferating" type1="proliferating" value="10"/>
+        </Interaction>
+        <ShapeSurface scaling="norm">
+            <Neighborhood>
+                <Order>2</Order>
+                <!--    <Disabled>
+        <Distance>2.5</Distance>
+    </Disabled>
+-->
+            </Neighborhood>
+        </ShapeSurface>
+        <MonteCarloSampler stepper="edgelist">
+            <MCSDuration value="0.1"/>
+            <MetropolisKinetics temperature="10"/>
+            <Neighborhood>
+                <Order>4</Order>
+            </Neighborhood>
+        </MonteCarloSampler>
+    </CPM>
+    <CellPopulations>
+        <Population type="proliferating" size="0">
+            <InitCircle mode="random" number-of-cells="30">
+                <Dimensions center="size.x/2, size.y/2, 0" radius="size.x/4"/>
+            </InitCircle>
+        </Population>
+    </CellPopulations>
+</MorpheusModel>

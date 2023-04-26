@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<MorpheusModel version="4">
+    <Description>
+        <Details></Details>
+        <Title></Title>
+    </Description>
+    <Space>
+        <Lattice class="square">
+            <Neighborhood>
+                <Order>1</Order>
+            </Neighborhood>
+            <Size symbol="size" value="1, 1, 0 "/>
+        </Lattice>
+        <SpaceSymbol symbol="space"/>
+    </Space>
+    <Time>
+        <StartTime value="0"/>
+        <StopTime value="100"/>
+        <TimeSymbol symbol="time"/>
+    </Time>
+    <Analysis>
+        <ModelGraph include-tags="#untagged" format="dot" reduced="false"/>
+        <Logger time-step="0.1 ">
+            <Input>
+                <Symbol symbol-ref="h"/>
+                <Symbol symbol-ref="b"/>
+                <Symbol symbol-ref="c"/>
+                <Symbol symbol-ref="p"/>
+                <Symbol symbol-ref="w"/>
+                <Symbol symbol-ref="diff"/>
+            </Input>
+            <Output>
+                <TextOutput file-name="automatic" file-format="csv"/>
+            </Output>
+            <Restriction condition="1">
+                <Celltype celltype="cell"/>
+            </Restriction>
+            <Plots>
+                <Plot file-numbering="time" log-commands="true">
+                    <Style grid="false" style="lines" line-width="3" decorate="true"/>
+                    <Terminal plot-size="200,200,0" terminal="png"/>
+                    <X-axis>
+                        <Symbol symbol-ref="time"/>
+                    </X-axis>
+                    <Y-axis>
+                        <Symbol symbol-ref="diff"/>
+                        <Symbol symbol-ref="b"/>
+                        <Symbol symbol-ref="c"/>
+                        <Symbol symbol-ref="p"/>
+                        <Symbol symbol-ref="w"/>
+                    </Y-axis>
+                </Plot>
+            </Plots>
+        </Logger>
+    </Analysis>
+    <Global/>
+    <CellTypes>
+        <CellType name="cell" class="biological">
+            <Property symbol="h" value="1870.3e-3"/>
+            <Property symbol="b" value="89.7e-3"/>
+            <Property symbol="c" value="80.3e-3 "/>
+            <Property symbol="p" value="0.4e-3"/>
+            <Property symbol="w" value="7.8e-3"/>
+            <Property symbol="diff" value="0.5"/>
+            <System time-scaling="1.0" time-step="1e-4" solver="Runge-Kutta [fixed, O(4)]">
+                <Constant symbol="K" value="0.2"/>
+                <Constant symbol="M" value="0.15"/>
+                <Constant symbol="P_h" value="2"/>
+                <Constant symbol="D_h" value="0.5"/>
+                <Constant symbol="P_b" value="1"/>
+                <Constant symbol="D_b" value="0.5"/>
+                <Constant symbol="P_c" value="1.1"/>
+                <Constant symbol="D_c" value="1"/>
+                <Constant symbol="P_p" value="1"/>
+                <Constant symbol="D_p" value="0.8"/>
+                <Constant symbol="P_w" value="1.1"/>
+                <Constant symbol="D_w" value="0.5"/>
+                <Constant symbol="n" value="1"/>
+                <Constant symbol="m" value="1"/>
+                <Constant symbol="q" value="1 "/>
+                <Constant symbol="r" value="1"/>
+                <Constant symbol="s" value="1"/>
+                <Constant symbol="" value="1"/>
+                <DiffEqn symbol-ref="diff">
+                    <Expression>K * (P_h * (h^n / (1 + h^n)) + P_b * (b^m / (1 + b^m)) + P_c * (c^q / (1 + c^q))) - M * diff * (P_p * (p^r / (1 + p^r)) + P_w * (w^s / (1 + w^s)))</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="h">
+                    <Expression>K * P_h * (h^m / (1 + h^m)) - D_h * h</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="b">
+                    <Expression>K * P_b * (b^m / (1 + b^m)) - D_b * b</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="c">
+                    <Expression>K * P_c * (c^q / (1 + c^q)) - D_c * c</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="p">
+                    <Expression>M * (P_p * (1 / (1 + p^r)) - D_p * p)
+</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="w">
+                    <Expression>M * (P_w * (1 / (1 + w^s)) - D_w * w)</Expression>
+                </DiffEqn>
+            </System>
+        </CellType>
+    </CellTypes>
+    <CellPopulations>
+        <Population type="cell" size="0">
+            <InitCellLattice/>
+        </Population>
+    </CellPopulations>
+</MorpheusModel>

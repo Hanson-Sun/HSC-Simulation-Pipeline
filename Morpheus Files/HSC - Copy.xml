@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<MorpheusModel version="4">
+    <Description>
+        <Details>... this is the CPM model for REX...&#xd;&#xd;
+&#xd;&#xd;
+ill add more descriptions later...maybe</Details>
+        <Title>HSC Proliferation</Title>
+    </Description>
+    <Space>
+        <Lattice class="square">
+            <Neighborhood>
+                <Order>1</Order>
+            </Neighborhood>
+            <Size symbol="size" value="200, 200, 0.0"/>
+            <BoundaryConditions>
+                <Condition type="noflux" boundary="x"/>
+                <Condition type="noflux" boundary="y"/>
+            </BoundaryConditions>
+            <NodeLength value="1.0"/>
+        </Lattice>
+        <SpaceSymbol symbol="space"/>
+    </Space>
+    <Time>
+        <StartTime value="0"/>
+        <StopTime value="1000"/>
+        <TimeSymbol symbol="time"/>
+        <RandomSeed value="0"/>
+        <SaveInterval value="0"/>
+    </Time>
+    <Analysis>
+        <ModelGraph include-tags="#untagged" format="dot" reduced="false"/>
+        <Logger time-step="1.0">
+            <Input>
+                <Symbol symbol-ref="p"/>
+                <Symbol symbol-ref="cell.id"/>
+                <Symbol symbol-ref="cell.type"/>
+            </Input>
+            <Output>
+                <TextOutput file-format="csv"/>
+            </Output>
+        </Logger>
+        <Gnuplotter time-step="1.0">
+            <Plot>
+                <Cells opacity="0.95" max="0.1" min="0" value="p">
+                    <ColorMap>
+                        <Color color="yellow" value="0.1"/>
+                        <Color color="violet" value="0"/>
+                    </ColorMap>
+                </Cells>
+            </Plot>
+            <Terminal name="png"/>
+        </Gnuplotter>
+    </Analysis>
+    <Global/>
+    <CellTypes>
+        <CellType name="proliferating" class="biological">
+            <Property symbol="p" value="0.10"/>
+            <Property symbol="a" value="55.5e-3"/>
+            <Property symbol="d" value="39.2e-3 "/>
+            <Property symbol="h" value="1870.3e-3"/>
+            <Property symbol="s" value="617.7e-3"/>
+            <CellDeath>
+                <Condition>p > 1</Condition>
+            </CellDeath>
+            <SurfaceConstraint target="0.9" strength="1" mode="aspherity"/>
+            <VolumeConstraint target="60" strength="1"/>
+            <CellDivision daughterID="dcell" division-plane="major" orientation="0.0, 0.0, 0.0">
+                <Condition>rand_uni(0,1) &lt; p*0.007</Condition>
+                <Triggers>
+                    <Rule symbol-ref="p">
+                        <Expression>if(dcell == 1, 0.10, 0.12)</Expression>
+                    </Rule>
+                    <Rule symbol-ref="a">
+                        <Expression>if( dcell == 1, 55.5e-3, a)</Expression>
+                    </Rule>
+                    <Rule symbol-ref="d">
+                        <Expression>if( dcell == 1, 39.2e-3, d) </Expression>
+                    </Rule>
+                    <Rule symbol-ref="h">
+                        <Expression>if( dcell == 1, 1870.3e-3, h)</Expression>
+                    </Rule>
+                    <Rule symbol-ref="s">
+                        <Expression>if( dcell == 1, 617.7e-3, s)
+</Expression>
+                    </Rule>
+                </Triggers>
+            </CellDivision>
+            <System time-scaling="0.1" time-step="1e-2" solver="Runge-Kutta [fixed, O(4)]">
+                <Constant symbol="k1" value="0.6"/>
+                <Constant symbol="k2" value="0.25"/>
+                <Constant symbol="k3" value="0.5"/>
+                <Constant symbol="k4" value="0.3"/>
+                <Constant symbol="k5" value="0.5"/>
+                <Constant symbol="k6" value="0.25"/>
+                <Constant symbol="k7" value="0.5"/>
+                <Constant symbol="k8" value="0.25"/>
+                <DiffEqn symbol-ref="p">
+                    <Expression>a*p - d*p</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="a">
+                    <Expression>k1*p - k2*h*a</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="d">
+                    <Expression>k3*h*d - k4*p</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="h">
+                    <Expression>k5*s - k6*h</Expression>
+                </DiffEqn>
+                <DiffEqn symbol-ref="s">
+                    <Expression>k7*h*p - k8*s</Expression>
+                </DiffEqn>
+            </System>
+        </CellType>
+        <CellType name="medium" class="medium"/>
+    </CellTypes>
+    <CPM>
+        <Interaction>
+            <Contact type2="medium" type1="proliferating" value="15"/>
+            <Contact type2="proliferating" type1="proliferating" value="10"/>
+        </Interaction>
+        <ShapeSurface scaling="norm">
+            <Neighborhood>
+                <Order>2</Order>
+                <!--    <Disabled>
+        <Distance>2.5</Distance>
+    </Disabled>
+-->
+            </Neighborhood>
+        </ShapeSurface>
+        <MonteCarloSampler stepper="edgelist">
+            <MCSDuration value="0.1"/>
+            <MetropolisKinetics temperature="10"/>
+            <Neighborhood>
+                <Order>4</Order>
+            </Neighborhood>
+        </MonteCarloSampler>
+    </CPM>
+    <CellPopulations>
+        <Population type="proliferating" size="0">
+            <InitCircle mode="random" number-of-cells="25">
+                <Dimensions center="size.x/2, size.y/2, 0" radius="size.x/3.5"/>
+            </InitCircle>
+        </Population>
+    </CellPopulations>
+</MorpheusModel>
