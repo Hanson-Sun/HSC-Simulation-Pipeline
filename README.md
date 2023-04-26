@@ -22,8 +22,13 @@ proliferative behavior of Myeloid Progenitor Cells, while building a framework t
 CD99, diffusive signaling, and other cell interaction pathways in the future.
 
 ## Summary of Results
-We were able to develop a rudimentary framework that is able to process raw cellular data, process it through statistical means, generate a system of ODEs, and combine everything in a multi-scale CPM model. Focusing on the CPM part, videos of the simulation can be found in the `Simulation Videos` folder. A more detailed overview can be found in the poster pdf `UBC MURC Poster V4 - ID 257.pdf`. Below are some summary images:
+We were able to develop a rudimentary framework that is able to process raw cellular data, process it through statistical means, generate a system of ODEs, and combine everything in a multi-scale CPM model. Focusing on the CPM part, videos of the simulation can be found in the `Simulation Videos` folder. A more detailed overview can be found in the poster pdf `UBC MURC Poster V4 - ID 257.pdf`. Below are some summary examples:
+
 ![](Images/cpm.png)
+
+https://user-images.githubusercontent.com/65196939/234496577-4a09897b-d81c-437a-bcb5-b14ac7b262b3.mp4
+
+https://user-images.githubusercontent.com/65196939/234496603-c285f47b-7eab-4c90-85f5-d045d52382b9.mp4
 
 
 ## Additional Research
