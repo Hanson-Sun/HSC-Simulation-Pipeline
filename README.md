@@ -1,5 +1,6 @@
 # HSC-Simulation-Pipeline
-Research results of a simulation pipeline for hematopoietic stem cells. The research was conducted in a team of 4 under the guidance of the graduate research Tiam Heydari @UBC. The project is falls under the subject the biomedical engineering, while my focus was on creating the cellular and ODE simulation. The final poster was presented at the 2023 MURC research conference held at UBC.
+Research results of a simulation pipeline for hematopoietic stem cells. The research was conducted in a team of 4 (Kyle Palacios, Janet L. He, Qais Alsharif, and I) under the guidance of the graduate researcher Tiam Heydari @UBC. The project is falls under the subject the biomedical engineering, while my focus was on creating the cellular and ODE simulation. The final poster was presented at the 2023 MURC research conference held at UBC.
+
 
 ## Abstract
 Hematopoietic stem cells (HSCs) are a type of stem cell that can develop into any type of blood
